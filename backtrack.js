@@ -1,86 +1,117 @@
-/*
-* Backtrack.js by Zaim Ramlan
-* 
-* backtrack.js functions to temporarily store the browser history
-* and allows a 'back' button to be displayed with the correct link
-* to go back to.
-*
-* something simple which SHOULD BE AVAILABLE by browser, but IT ISN'T!
-* a simple `window.history.pop()` couldn't be done and hence, 
-* this plugin was born ~
+/**
+* Backtrack 2.0.0
+* Copyright © Zaim Ramlan
 */
-var Backtrack = function() {
-	// pushes the current page into the history stack
-	this.push_page = function() {
-		pages_from_storage = sessionStorage.getItem('backtracks');
-		if(pages_from_storage == null) {
-			pages = new Array();
-		} else {
-			pages = pages_from_storage.split(',');
-		}
-		/*
-		* if the last page in the history stack is not the same as the current page,
-		* only then we push it into the history stack.
-		*
-		* this condition can happen upon page reload/refresh:
-		* 0. Load page A the first time and it goes into the history stack 
-		* 1. Now page A is in history stack
-		* 2. Reload/refresh Page A
-		* 3. Checks if Page A is in the stack (it is!)
-		* 4. Ignores it, otherwise we will have a consequent duplicate entry
-		*/
-		if(pages[pages.length-1] != location.href) pages.push(location.href);
-		sessionStorage.setItem('backtracks', pages.toString());
-	}
 
-	// removes the last page in the history stack
-	this.pop_page = function() {
-		pages_from_storage = sessionStorage.getItem('backtracks');
-		/*
-		* pages are stored as "domain.com/page_a, domain.com/page_b, ..."
-		* split the string and put it as an array into `pages`
-		*/
-		pages = pages_from_storage.split(',');
-		// remove the page from the history stack
-		pages.pop();
-		sessionStorage.setItem('backtracks', pages.toString());		
-	}
+class Backtrack {
+    /**
+     * Initializes an instance of Backtrack.
+     *
+     * @constructor
+     * @author: Zaim Ramlan
+     * @param {string} backButtonId The `id` property of the back button.
+     */
+    constructor(backButtonId) {
+        this._storageKey = 'backtracks';
+        this._backButtonId = backButtonId;
+    }
 
-	// returns the back link
-	this.back_link = function() {
-		pages_from_storage = sessionStorage.getItem('backtracks');
-		/*
-		* pages are stored as "domain.com/page_a, domain.com/page_b, ..."
-		* split the string and put it as an array into `pages`
-		*/		
-		pages = pages_from_storage.split(',');
-		/*
-		* the back link will be the page before the current page.
-		* 
-		* actually, it should be `pages.length - 1`, but since
-		* JS array starts from [0], we need to to minus an extra 1
-		*/
-		back_link = pages[pages.length - 2];
-		return back_link;
-	}
+    /**
+     * Configures the back button to execute `popPage()` on keyUp and
+     * sets its href property.
+     *
+     * assumptions:
+     * 1) Back link is a `<a href=""></a>`
+     * 2) Back link has the id stored in `_backButtonId`
+     *
+     * i.e.
+     * <a id="back_button" href="">Back</a>
+     */
+    configureBackButton() {
+        var backButton = document.getElementById(this._backButtonId);
+        var url = this._getBackButtonURL();
+        var _this = this;
 
-	/*
-	* sets the back_link href
-	* assumptions:
-	* 1) Back link is a `<a href=""></a>`
-	* 2) Back link has an id of `back_link_id`
-	* 
-	* i.e.
-	* <a id="back_button" href="">Back</a>
-	*/
-	this.set_back_link = function(back_link_id) {
-		// finds the back button with id `back_link_id`
-		back_button = document.getElementById(back_link_id);
-		// if there IS a back button of id `back_link_id`, only then set the back link href
-		if (back_button != null) back_button.href = this.back_link(); 
-	}
+        if (backButton !== null) {
+            if (url !== '') backButton.href = url;
+            backButton.onmouseup = function() { _this.popPage(); };
+        }
+    }
 
-	this.reset = function() {
-		sessionStorage.removeItem('backtracks');
-	}		
+    /**
+     * Pushes the current page into the history stack if it's not already in.
+     */
+    pushPage() {
+        var currentPage = location.href;
+
+        var pages = this._getStoredPages();
+        var previousPageIndex = pages.length - 1;
+        var previousPage = pages[previousPageIndex];
+
+        if (currentPage !== previousPage) {
+            pages.push(currentPage);
+            this._setToStore(pages);
+        }
+    }
+
+    /**
+     * Removes the last page in the history stack.
+     */
+    popPage() {
+        var pages = this._getStoredPages();
+        pages.pop();
+        this._setToStore(pages);
+    }
+
+    /**
+     * Removes all stored pages.
+     */
+    removeAllPages() {
+        sessionStorage.removeItem(this._storageKey);
+    }
+
+    /**
+     * Returns the page, before the current page, as the link to go back.
+     *
+     * @return {string} The previous page URL visited by the user, or
+     *                  an empty string if there was no (or only one) stored page(s).
+     */
+    _getBackButtonURL() {
+        var pages = this._getStoredPages();
+        if (pages.length <= 1) return '';
+
+        var secondLastIndex = pages.length - 2;
+        var secondLastPage = pages[secondLastIndex];
+
+        var lastIndex = pages.length - 1;
+        var lastPage = pages[lastIndex];
+
+        var currentPage = location.href;
+        var previousPage = currentPage === lastPage ? secondLastPage : lastPage;
+        return previousPage;
+    }
+
+    /**
+     * Get the stored pages.
+     *
+     * @return {array} An array of stored pages, or an empty array it's not present.
+     */
+    _getStoredPages() {
+        var pages = sessionStorage.getItem(this._storageKey);
+        if (pages !== null && pages !== '') {
+            return pages.split(',');
+        }
+        return [];
+    }
+
+    /**
+     * Store the given pages array.
+     *
+     * param {array} pages The array of pages to be stored.
+     */
+    _setToStore(pages) {
+        sessionStorage.setItem(this._storageKey, pages.toString());
+    }
 }
+
+module.exports = Backtrack;
