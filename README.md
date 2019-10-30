@@ -22,7 +22,7 @@ Assuming you have a back button with `id="universal_back_button"`:
 
 1. On each page load, create a new Backtrack instance with the expected `backButtonId`.
     ```javascript
-    var backtrack = new Backtrack(timerDurationInSeconds, uniqueTimerContainerClassName, originalTextInContainer)
+    var backtrack = new Backtrack("universal_back_button")
     ```
 
 1. Call `configureBackButton()` to configure the back button's URL (via `href` attribute) and to pop pages when clicked (via `onClick` attribute).
