@@ -1,7 +1,7 @@
 # Backtrack for JavaScript
 ![npm](https://img.shields.io/npm/v/backtrack-js)
 
-A simple way to initialize a back button link's URL.
+A simple way to allow browsing history linking.
 
 ## Installation
 ### <img src="https://avatars1.githubusercontent.com/u/22247014?s=200&v=4" width="20" height="20"> Yarn
