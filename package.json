@@ -1,11 +1,11 @@
 {
   "name": "backtrack-js",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A simple way to allow browsing history linking.",
   "main": "backtrack.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lambdable/backtrack-js.git"
+    "url": "git+https://github.com/pakej/backtrack-js.git"
   },
   "keywords": [
     "browser",
@@ -14,10 +14,10 @@
     "button",
     "javascript"
   ],
-  "author": "Zaim Ramlan <zaem.muz@gmail.com>",
+  "author": "Zaim Ramlan <zaimramlan@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lambdable/backtrack-js/issues"
+    "url": "https://github.com/pakej/backtrack-js/issues"
   },
-  "homepage": "https://github.com/lambdable/backtrack-js#readme"
+  "homepage": "https://github.com/pakej/backtrack-js#readme"
 }
